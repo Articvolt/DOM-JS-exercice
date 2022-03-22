@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <title>Document</title>
+    </head>
+
+    <body>
+        <div id="board"></div>
+        
+
+        <script>
+
+            // /* création d'un script pour mélanger les boîtes aléatoirement */
+            // let i = board.children.length, k , temp
+            // while(i-- > 0){
+            //     /* k stocke un nombre aléatoire basé sur i */
+            //     k = Math.floor(Math.random() * (i+1))
+            //     /* temp pointe temporairement l'élément à la position k dans "board" */
+            //     temp = board.children[k]
+            //     /* remplace l'élément à la position k par l'élément à la position i */
+            //     board.children[k] = board.children[i]
+            //     /*place l'élément k pointé temporairement à la fin du contenu de board */
+            //     board.appendChild(temp)
+            // }
+
+            // version plus simplifié sous forme de fonction
+            function shuffleChildren(parent){
+                let children = parent.children
+                let i = children.length, k , temp
+                while(i-- > 0){
+                    k = Math.floor(Math.random() * (i+1))
+                    temp = children[k]
+                    children[k] = children[i]
+                    parent.appendChild(temp)
+                }
+            }
+
+            /* création d'une instance "div" stockée dans une constante "box" */
+            const box = document.createElement("div")
+            box.classList.add("box")
+
+            /* placer box en enfant de la div #board */
+            const board = document.querySelector("#board")
+            
+            //variable du numéro de la boîte attendue
+            let nb = 1 
+
+            /* boucle pour faire apparaitre plusieurs box (ici 10) */
+            for(let i = 1; i <=10; i++){
+                const newbox = box.cloneNode()
+                /* insertion d'un texte dans cette box */
+                newbox.innerText = i
+                board.appendChild(newbox)
+
+                //fonction pour supprimer message d'alerte
+                function showReaction(type, clickedBox){
+                    clickedBox.classList.add(type)
+                    if (type !== "success"){
+                        setTimeout(function(){
+                            clickedBox.classList.remove(type)
+                        }, 800)
+                    }
+                }
+
+                // création événement click dans la boucle pour être effectuée sur toute les boîtes
+                newbox.addEventListener("click",function(){
+                    
+                    // on vérifie si la boîte séléctionnée est identique à "nb"
+                    if(i == nb){
+                        newbox.classList.add("box-valid")
+
+                        //1 si nb = au nombre total de boîte, affichage de victoire
+                        if(nb== board.children.length){
+                           board.querySelectorAll(".box").forEach(function(box){
+                               showReaction("success", box)
+                           })
+                        }
+                        nb++
+                    } 
+                    
+                    //2 si le numéro de boîte > nb, alors le jeu est perdu
+                    else if(i > nb){
+                        showReaction("error", newbox)
+                        nb = 1
+                        //permet de remettre en valide les box lorsque le jeu recommence
+                        board.querySelectorAll(".box-valid").forEach(function(validBox){
+                            validBox.classList.remove("box-valid")
+                        })
+                    }
+
+                    //3 si le joueur clique sur une boîte déjà validée, on l'informe, le jeu n'est pas reset
+                    else{
+                        showReaction("notice", newbox)
+                    }
+                })
+            }
+
+            shuffleChildren(board)
+
+        </script>
+    </body>
+</html>
